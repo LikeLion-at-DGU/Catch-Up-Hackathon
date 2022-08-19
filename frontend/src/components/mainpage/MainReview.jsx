@@ -34,26 +34,26 @@ const MoreInfo = styled(FontAwesomeIcon)`
 
 const reviewArray = [
     {
-        title : "밥을 불어 길지 그들의 그들은 위하여서.",
-        body : "곳으로 천지는 우리 들어 불어 아니다. 역사를 커다란 주는 그들은 그러므로 소리다.이것은 철환하였는가? 아름답고 이상 없는 것이다. 황금시대를 위하여.",
+        title : "컴공 2점대 Naver 서버개발자 취업 후기",
+        body : "궁금했던 점과 고민들이 시원하게 해결됐습니다. 캣취업하기를 정말 잘한 거 같아요!! 다음에 또 신청하겠습니다!! 감사합니다.",
         rate : 4,
         who: "안경잡이",
         img : "https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
         id : 1
     },
     {
-        title : "밥을 불어 길지 그들의 그들은 위하여서.",
-        body : "곳으로 천지는 우리 들어 불어 아니다. 역사를 커다란 주는 그들은 그러므로 소리다.이것은 철환하였는가? 아름답고 이상 없는 것이다. 황금시대를 위하여며.",
+        title : "대학원 간 썰",
+        body : "늦은 시간 생산적인 조언 많이 해주셔서 감사합니다! 잘 참고해서 성공적인 연협하겠습니다 :) 편안한 밤 보내시길 바라요",
         rate : 5,
-        who: "빡빡이 아조씨",
+        who: "대학원의 노예",
         img : "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=798&q=80",
         id : 2
     },
     {
-        title : "밥을 불어 길지 그들의 그들은 위하여서.",
-        body : "곳으로 천지는 우리 들어 불어 아니다. 역사를 커다란 주는 그들은 그러므로 소리다.이것은 철환하였는가? 아름답고 이상 없는 것이다. 황금시대를 위하여.",
+        title : "지방대에서 구글 본사 가기까지",
+        body : "현실적인 조언을 주셔서 감사합니다. 제 포트폴리오의 가장 큰 문제점이 무엇인지에 대해서 알 수 있었고, 현재 시점에서 어떤 회사에 입사했을 때 가장 성장할 수 있을지에 대란 조언도 아낌없이 해주셨습니다. ",
         rate : 4,
-        who: "개발좀 잘하게 생긴사람",
+        who: "개발 잘하고 싶어요",
         img : "https://images.unsplash.com/photo-1557862921-37829c790f19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1771&q=80",
         id : 3
     },

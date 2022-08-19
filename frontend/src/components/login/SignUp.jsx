@@ -56,7 +56,7 @@ const SubBtn = styled.button`
 `
 
 function SignUp() {
-    const {register, handleSubmit} = useForm();
+    const {register, handleSubmit, formState} = useForm();
     const navigate = useNavigate();
     const setAtom = useSetRecoilState(isUser);
 
@@ -80,11 +80,15 @@ function SignUp() {
             console.log(error)
         }
     }
+    const onFaile = () => {
+        window.alert(Object.values(formState.errors)[0].message)
+    }
+
 
 
     return(
         <Wapper>
-            <Form onSubmit={handleSubmit(onValid)}>
+            <Form onSubmit={handleSubmit(onValid, onFaile)}>
                 <FormSection>
                     <Icon icon={faIdBadge} />
                     <Input {...register("id" , {required:true})} placeholder="아이디"></Input>

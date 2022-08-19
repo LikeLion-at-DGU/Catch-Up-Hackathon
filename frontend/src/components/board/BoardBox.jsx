@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { isBox, isUser } from '../../atoms';
+import { isBox, isUser, isChatId } from '../../atoms';
 import { LogAPI, API } from '../../axios';
 import { useEffect } from 'react';
 
@@ -151,16 +151,25 @@ function BoardBox({props}) {
     const navigate = useNavigate()
     const checkUser = useRecoilValue(isUser);
     const setAtom = useSetRecoilState(isBox)
+    const setChatid = useSetRecoilState(isChatId);
 
     const onLike = async() => {
         await LogAPI.post(`/posts/${props.post.id}/`)
         setAtom(false);
     }
 
+    const makeChatRoom = async() => {
+        const data = {
+            "post_id":props.post.id
+        }
+        await LogAPI.post(`/chat/createroom/`, data).then(res => setChatid(res.data.chatroom.id))
+    }
+
     const onClick = () => {
         if(checkUser || localStorage.getItem('user')){
-            if (window.confirm(`이 채팅에 필요한 츄르의 개수는 ${props.post.coin}개 입니다! \n(채팅 내에서 전화번호, 이메일등의 개인정보 교환은 금지됩니다.)`)){
-                navigate("/chat")
+            if (window.confirm(`이 채팅에 필요한 츄르의 개수는 ${props.post.churu}개 입니다! \n(채팅 내에서 전화번호, 이메일등의 개인정보 교환은 금지됩니다.)`)){
+                makeChatRoom()
+                navigate(`/chat/room/${props.post.id}`)
             }
         }else{
             alert("로그인 이후 사용가능하십니다!");

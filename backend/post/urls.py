@@ -9,7 +9,7 @@ urlpatterns = [
 
     # 리뷰
     path('review/', review_list, name='reviewList'), # 모든 댓글 보여주기
-    path('<int:post_pk>/review/', review_create, name='review'), # 특정 포스트에 댓글 작성
+    path('review/create/', review_create, name='review'), # 특정 포스트에 댓글 작성
     path('<int:post_pk>/review/<int:review_pk>/', review_detail, name='review_detail'), # 특정 포스트에 댓글 수정, 삭제
     path('search/', post_search, name='search'),
 
@@ -22,4 +22,5 @@ urlpatterns = [
     path('event/', event_list, name='eventList'),
     # 메인페이지
     path('mainpage/', mainpage, name="mainpage"),
+
 ]

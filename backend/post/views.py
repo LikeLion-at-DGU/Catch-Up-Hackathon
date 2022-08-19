@@ -21,7 +21,7 @@ def mainpage(request):
     if request.method=='GET':
         #최신 게시물 6개
         if len(Post.objects.all())>=6:
-            posts=Post.objects.all()[:6]
+            posts=Post.objects.all().order_by('-created_at')[:6]
         else:
             posts=Post.objects.all()
         data = []
@@ -206,29 +206,60 @@ def post_detail(request, post_pk):
 # 모든 댓글 보여주기
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def review_list(request):
-    reviews = Review.objects.all()
-    serializer = ReviewSerializer(reviews, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET', 'POST'])
-def review_create(request, post_pk):
-    post = get_object_or_404(Post, pk=post_pk)
-    writer = request.user
-
     if request.method == 'GET':
-        reviews = Review.objects.filter(post=post)
+        reviews = Review.objects.all()
         serializer = ReviewSerializer(reviews, many=True)
-        return Response(data=serializer.data)
-
+        return Response(serializer.data)
     elif request.method == 'POST':
+        posts = Post.objects.filter(writer=request.data['user_id'])
+        result_review = []
+        for post in posts:
+            reviews = Review.objects.filter(post=post)
+            for review in reviews:
+                profile=get_object_or_404(Profile, user=review.writer)
+                review_serializer = ReviewSerializer(review)
+                profile_serializer = ProfileSerializer(profile)
+                review_writer_set = {
+                    "review":review_serializer.data,
+                    "topic":post.title,
+                    "writer":profile_serializer.data
+                }
+                result_review.append(review_writer_set)
+        return Response(result_review)
+
+
+from chat.models import *
+@api_view(['POST'])
+def review_create(request):
+    if request.method == 'POST':
+        room=get_object_or_404(Chatroom, pk=request.data['chatroom_id'])
         review_serializer = ReviewSerializer(data=request.data)
         if review_serializer.is_valid(raise_exception=True):
-            review_serializer.save(post=post, writer=writer)
+            review_serializer.save(
+                post=room.post, 
+                writer=request.user)
         return Response(data=review_serializer.data)
+
+@api_view([''])
+
+#@api_view(['GET', 'POST'])
+#def review_create(request, post_pk):
+#    post = get_object_or_404(Post, pk=post_pk)
+#    writer = request.user
+#
+#    if request.method == 'GET':
+#        reviews = Review.objects.filter(post=post)
+#        serializer = ReviewSerializer(reviews, many=True)
+#        return Response(data=serializer.data)
+#
+#    elif request.method == 'POST':
+#        review_serializer = ReviewSerializer(data=request.data)
+#        if review_serializer.is_valid(raise_exception=True):
+#            review_serializer.save(post=post, writer=writer)
+#        return Response(data=review_serializer.data)
 
 
 @api_view(['GET', 'PATCH', 'DELETE'])

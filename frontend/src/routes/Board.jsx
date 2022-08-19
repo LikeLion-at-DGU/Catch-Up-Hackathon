@@ -46,7 +46,7 @@ const SubTitle = styled.h4`
 
 const Write = styled(FontAwesomeIcon)`
     position: fixed;
-    font-size: 50px;
+    font-size: 60px;
     bottom : 10%;
     right: 10%;
     cursor: pointer;

@@ -29,8 +29,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
             expired_at = data["exp"]
             user = User.objects.get(id=user_id)
 
-        # except (jwt.DecodeError, jwt.InvalidAlgorithmError, AttributeError):
-            #raise exceptions.AuthenticationFailed("Invalid Token")
+        except (jwt.DecodeError, jwt.InvalidAlgorithmError, AttributeError):
+            raise exceptions.AuthenticationFailed("Invalid Token")
         except jwt.DecodeError:
             raise exceptions.AuthenticationFailed("Invalid Token, DecodeError")
         except jwt.InvalidAlgorithmError:
