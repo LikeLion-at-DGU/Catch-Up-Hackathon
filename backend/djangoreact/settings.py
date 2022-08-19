@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 
@@ -43,7 +44,7 @@ INSTALLED_APPS = [
     'users',
     'chat',
 
-    #설치한 라이브러리들
+    # 설치한 라이브러리들
     'rest_framework',
     'rest_framework.authtoken',
     'dj_rest_auth',
@@ -54,6 +55,16 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
 ]
 
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'my-app-auth'
+JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=14),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=31),
+}
+
+
 SITE_ID = 1
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
@@ -62,8 +73,12 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ]
+        'rest_framework.permissions.IsAuthenticated',
+
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'users.authentications.JWTAuthentication',
+    )
 }
 
 MIDDLEWARE = [
@@ -77,12 +92,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
-
-CORS_ORIGIN_WHITELIST = (
-    'https://localhost:3000',
-    'https://localhost:8000',
-    'https://127.0.0.1:8000'
-)
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -159,7 +168,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL = '/media/' # 미디어 파일 경로 설정 
+MEDIA_URL = '/media/'  # 미디어 파일 경로 설정
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'users.User'
+
+CORS_ALLOW_CREDENTIALS = True

@@ -2,6 +2,10 @@ import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faIdBadge, faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from 'react-router-dom';
+import {API} from '../../axios';
+import { isUser } from '../../atoms';
+import { useSetRecoilState } from 'recoil';
 
 const Wapper = styled.div`
     width: 100%;
@@ -15,7 +19,7 @@ const Form = styled.form`
     flex-direction: column;
     width: 100%;
     align-items: center;
-    margin-top: 50px;
+    margin-top: 30px;
 `
 const FormSection = styled.div`
     position: relative;
@@ -53,10 +57,30 @@ const SubBtn = styled.button`
 
 function SignUp() {
     const {register, handleSubmit} = useForm();
+    const navigate = useNavigate();
+    const setAtom = useSetRecoilState(isUser);
 
-    const onValid = (data) => {
-        console.log(data);
+    const onValid = async(data) => {
+        const result = {
+            username: data.id,
+            email : data.email,
+            password1: data.pw1,
+            password2 : data.pw2
+        };
+        try{
+            await API.post('/signup/', result).then(
+                response => {
+                    localStorage.setItem("user",response.data.access_token)
+                    setAtom(response.data.access_token);
+                }
+            )
+            navigate("/mypage/fix")
+            window.location.reload();
+        } catch(error){
+            console.log(error)
+        }
     }
+
 
     return(
         <Wapper>
@@ -66,17 +90,21 @@ function SignUp() {
                     <Input {...register("id" , {required:true})} placeholder="아이디"></Input>
                 </FormSection>
                 <FormSection>
-                    <Icon icon={faLock} />
-                    <Input {...register("pw" , {required:true})} placeholder="비밀번호" type="password"></Input>
-                </FormSection>
-                <FormSection>
                     <Icon icon={faEnvelope} />
-                    <Input {...register("Email" , {required:true,
+                    <Input {...register("email" , {required:true,
                     pattern : {
                         value:/^[A-Za-z0-9._%+-]+@+[A-Za-z]+.+[A-Za-z]$/
                     }})} placeholder="이메일"></Input>
                 </FormSection>
-                <SubBtn>
+                <FormSection>
+                    <Icon icon={faLock} />
+                    <Input {...register("pw1" , {required:true})} placeholder="비밀번호" type="password"></Input>
+                </FormSection>
+                <FormSection>
+                    <Icon icon={faLock} />
+                    <Input {...register("pw2" , {required:true})} placeholder="비밀번호 확인" type="password"></Input>
+                </FormSection>
+                <SubBtn type='sumbit'>
                     <p>로그인</p>
                 </SubBtn>
             </Form>

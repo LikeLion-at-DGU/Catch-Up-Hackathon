@@ -3,6 +3,8 @@ import {useForm} from "react-hook-form";
 import PostingHash from '../components/posting/PostingHash';
 import { useRecoilValue } from 'recoil';
 import { isTag } from '../atoms';
+import { LogAPI } from '../axios';
+import { useNavigate } from 'react-router-dom';
 
 const ToCenter = styled.div`
 width:100vw;
@@ -14,7 +16,7 @@ const Background = styled.section`
     background-color: ${props => props.theme.mainBackColor};
     max-width: 700px;
     width : 100%; 
-    margin-top: 1px;
+    margin-top: 3px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -108,10 +110,22 @@ const FormBtn = styled.button`
 function Posting(){
     const isAtom = useRecoilValue(isTag);
     const {register, handleSubmit } = useForm();
+    const navigate = useNavigate();
 
-    const onValid = (data) => {
+    const onValid = async(data) => {
         const newData = {...data, isAtom}
-        console.log(newData);
+        const sendData = {
+            "title" : newData.title,
+            "content" : newData.content,
+            "tag" : newData.isAtom,
+            "coin" : newData.chur
+        }
+        try{
+            await LogAPI.post('/posts/', sendData)
+            navigate("/board")
+        } catch(error){
+            console.log(error)
+        }
     }
 
     return(

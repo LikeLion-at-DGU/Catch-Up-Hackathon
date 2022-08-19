@@ -3,6 +3,10 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faIdBadge, faLock, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
+import { isUser } from '../../atoms';
+import { API } from '../../axios';
 
 const Wapper = styled.div`
     width: 100%;
@@ -115,9 +119,26 @@ const SubBtn = styled.button`
 function Log() {
     const {register, handleSubmit} = useForm();
     const [isRe, setIsRe] = useState(false);
+    const navigate = useNavigate();
+    const setAtom = useSetRecoilState(isUser);
 
-    const onValid = (data) => {
-        
+    const onValid = async(data) => {
+        const result = {
+            "username": data.id,
+            "password": data.pw,
+        };
+        try{
+            await API.post('/login/', result).then(
+                response => {
+                    localStorage.setItem("user", response.data.access_token,);
+                    setAtom(response.data.access_token);
+                }
+            )
+            navigate("/")
+            window.location.reload();
+        } catch(error){
+            console.log(error)
+        }
     }
     
     return(

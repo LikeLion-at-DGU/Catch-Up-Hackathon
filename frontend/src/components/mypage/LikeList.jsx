@@ -1,10 +1,13 @@
 import styled from 'styled-components';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faHeart, faMessage, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faStar, faHeart, faEye, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BoardBox from '../board/BoardBox';
+import { LogAPI } from '../../axios';
+import { useRecoilState } from 'recoil';
+import { isBox } from '../../atoms';
 
 const ToCenter = styled.div`
     color: rgb(24,62,78);
@@ -43,6 +46,7 @@ const List = styled.section`
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     padding: 60px 0;
+    min-height: 80vh;
     background-color: rgba(104,220,196);
     display: flex;
     flex-direction: column;
@@ -182,45 +186,24 @@ const XMark = styled(FontAwesomeIcon)`
 `
 
 
-// BigBox
-
-
-const InsightInfo = [
-    {
-        img : "https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-        category : ["#공대생", "#IT", "#네카라쿠배", "#클라우드", "#네카라쿠배 면접꿀팁", "#AWS", "#개발자 자기소개서"],
-        title : "정통 3.03의 네카라쿠배 클라우드 최종합격 후기",
-        like : 20,
-        link : 8,
-        rate : 4.4,
-        name : "네카라쿠데타",
-        id: 1
-    },
-    {
-        img : "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=798&q=80",
-        category : ["#마케팅", "#국문과취업", "#글쓰기"],
-        title : "글빨로 TvN 합격한 썰",
-        like : 10,
-        link : 4,
-        rate : 4.8,
-        name : "오잉",
-        id : 2
-    },
-    {
-        img : "https://images.unsplash.com/photo-1557862921-37829c790f19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1771&q=80",
-        category : ["#어학연수", "#미국", "#세관면접 팁", "#미국 동부", "#영어", "#미국 어학연수 추천코스", "여행코스도 추천 가능"],
-        title : "보스턴대학교 2달 어학연수 후기",
-        like : 9,
-        link : 2,
-        rate : 5.0,
-        name : "미국병",
-        id : 3
-    },
-]
-
 function LikeList () {
-    const [clicked, setClicked] = useState(false);
+    const [clicked, setClicked] = useRecoilState(isBox);
     const [clickedInfo, setClickedInfo] = useState([]);
+    const [info, setInfo] = useState([])
+
+    const getList = async() => {
+        try{
+            const data = await LogAPI.get("/users/myprofile/")
+            setInfo(data.data.like_user_post)
+        }catch(error){
+            console.log(error)
+        }
+    }
+    console.log(info)
+
+    useEffect(() => {
+        getList()
+    },[clicked])
 
     const onBoxClick = (i) => {
         setClicked(prev => !prev);
@@ -237,34 +220,34 @@ function LikeList () {
                 <BigTitle>내가 좋아요 누른 글</BigTitle>
                 <Wapper>
                 <List>
-                    {InsightInfo.map(prev => (
-                        <BoxWapper layoutId={prev.id+""} onClick={() => onBoxClick(prev)} key={prev.id}>
-                            <Box >
-                            <BoxProfile>
-                                <Img src={prev.img} />
-                                <Name>{prev.name}</Name>
-                            </BoxProfile>
-                            <BoxInfo>
-                                <Title>{prev.title}</Title>
-                                <Tags>{prev.category.map(i => <p>{i}</p>)}</Tags>
-                                <BoxChatInfo>
-                                    <Rate>
-                                        <Icon icon={faStar} />
-                                        <p>{prev.rate}</p>
-                                    </Rate>
-                                    <Like>
-                                        <Icon icon={faHeart} />
-                                        <p>{prev.like}</p>
-                                    </Like>
-                                    <ChatNum>
-                                        <Icon icon={faMessage} />
-                                        <p>{prev.link}</p>
-                                    </ChatNum>
-                                </BoxChatInfo>
-                            </BoxInfo>
-                        </Box>
-                        </BoxWapper>
-                    ))}
+                {info?.map(prev => (
+                    <BoxWapper layoutId={prev.post.id+""} onClick={() => onBoxClick(prev)} key={prev.post.id}>
+                        <Box >
+                        <BoxProfile>
+                            <Img src={prev.writer.image ? prev.writer.image : `https://t1.daumcdn.net/cfile/tistory/2513B53E55DB206927`} />
+                            <Name>{prev.writer.nickname}</Name>
+                        </BoxProfile>
+                        <BoxInfo>
+                            <Title>{prev.post.title}</Title>
+                            <Tags>{prev.tag.map(i => <p>{i}</p>)}</Tags>
+                            <BoxChatInfo>
+                                <Rate>
+                                    <Icon icon={faStar} />
+                                    <p>{prev.rate}</p>
+                                </Rate>
+                                <Like>
+                                    <Icon icon={faHeart} />
+                                    <p>{prev.post.like_users.length}</p>
+                                </Like>
+                                <ChatNum>
+                                    <Icon icon={faEye} />
+                                    <p>{prev.post.view_users}</p>
+                                </ChatNum>
+                            </BoxChatInfo>
+                        </BoxInfo>
+                    </Box>
+                    </BoxWapper>
+                ))}
                 </List>
 
                 {/* 모달창 */}

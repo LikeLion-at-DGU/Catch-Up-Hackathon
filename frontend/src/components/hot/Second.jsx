@@ -1,15 +1,12 @@
 import styled from 'styled-components';
-import { useParams } from "react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquarePen, faStar, faHeart, faEye, faCircleXmark , faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { Link, useNavigate } from 'react-router-dom';
+import { faStar, faHeart, faEye, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect } from 'react';
-import BoardBox from './BoardBox';
-import { LogAPI } from '../../axios';
-import { useForm } from 'react-hook-form';
+import { LogAPI, API } from '../../axios';
 import { useRecoilState } from 'recoil';
 import { isBox } from '../../atoms';
+import BoardBox from '../board/BoardBox';
 
 const ToCenter = styled.div`
     width:100vw;
@@ -46,50 +43,7 @@ const LargeSubTitle = styled.h4`
     max-width:${props => props.theme.mainMaxWidth};
     text-align: left;
     color : rgba(0,0,0,0.5);
-    margin-bottom: 55px;
 `
-
-
-const Write = styled(FontAwesomeIcon)`
-    position: fixed;
-    font-size: 50px;
-    bottom : 10%;
-    right: 10%;
-    cursor: pointer;
-`
-
-const SearchWapper = styled.section`
-    width: ${props => props.theme.mainWidth};
-    max-width:${props => props.theme.mainMaxWidth};
-`
-
-const SearchSession = styled.section`
-    width:100%;
-    margin-bottom: 40px;
-`
-
-const SearchForm = styled.form`
-    width:100%;
-    position: relative;
-`
-
-const SearchInput = styled.input`
-    width:100%;
-    height: 45px;
-    font-size: 22px;
-    padding-left: 42px;
-    border : none;
-    border-radius: 15px;
-    background-color: #F5F5F5;
-`
-
-const SearchInputIcon = styled(FontAwesomeIcon)`
-    position: absolute;
-    bottom : 9px;
-    left: 8px;
-    font-size: 27px;
-`
-
 
 
 const Wapper = styled.section`
@@ -106,7 +60,7 @@ const List = styled.section`
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 60vh;
+    min-height: 80vh;
 `
 
 const BoxWapper = styled(motion.div)`
@@ -243,28 +197,11 @@ const XMark = styled(FontAwesomeIcon)`
     cursor: pointer;
 `
 
-const BoardDivider = styled.div`
-    max-width: 700px;
-    width : 100%; 
-    height: 3px;
-    border-radius: 4px;
-    background-color: black;
-`
 
-const NoWarnning = styled.h1`
-    font-size: 30px;
-    text-align: center;
-    font-weight: 800;
-
-`
-
-function BoardSearch() {
-    const params = useParams();
+function Second () {
     const [clicked, setClicked] = useRecoilState(isBox);
     const [clickedInfo, setClickedInfo] = useState([]);
     const [info, setInfo] = useState([])
-    const navigator = useNavigate();
-    const {register, handleSubmit} = useForm();
 
     const onBoxClick = (i) => {
         setClicked(prev => !prev);
@@ -276,23 +213,14 @@ function BoardSearch() {
     }
 
     const onSeacrh = async() => {
-        const search = {
-            "query" : params.search
-        }
         try{
-            await LogAPI.post('/posts/search/', search).then(
-                response => {
-                    setInfo(response.data)
-                }
-            )
-        } catch(error){
-            console.log(error)
-        }
-    }
-
-    const onValid = async(data) => {
-        try{
-            navigator(`/board/search/${data.search}`)
+            if(localStorage.getItem("user")){
+                const data = await LogAPI.get("/posts/overseas/")
+                setInfo(data.data)
+            }else{
+                const data = await API.get("/posts/overseas/")
+                setInfo(data.data)
+            }
         } catch(error){
             console.log(error)
         }
@@ -302,23 +230,13 @@ function BoardSearch() {
         onSeacrh()
     },[clicked])
 
+
     return(
         <ToCenter>
             <Background>
-                <LargeTitle>{`${params.search}검색결과`}</LargeTitle>
-                <LargeSubTitle>당신이 원하는 멘토들의 글을 찾아보세요!</LargeSubTitle>
-                <SearchWapper>
-            <SearchSession>
-                <SearchForm onSubmit={handleSubmit(onValid)}>
-                    <SearchInputIcon icon={faMagnifyingGlass}/>
-                    <SearchInput 
-                        {...register("search", {required : true} )}
-                        placeholder = "제목, 내용, 해시태그 검색" >
-                    </SearchInput>
-                </SearchForm>
-            </SearchSession>
-        </SearchWapper>
-        <BoardDivider />
+                <LargeTitle>#해외취업</LargeTitle>
+                <LargeSubTitle>세계로 뻗어나가는 새로운 흐름</LargeSubTitle>
+        
         <Wapper>
             <List>
                 {info?.map(prev => (
@@ -365,9 +283,8 @@ function BoardSearch() {
                         </Overlay> : null}
             </AnimatePresence>
         </Wapper>
-                {localStorage.getItem("user") && <Link to="/posting" ><Write icon={faSquarePen} /></Link>}
             </Background>
         </ToCenter>
     );
 }
-export default BoardSearch;
+export default Second;

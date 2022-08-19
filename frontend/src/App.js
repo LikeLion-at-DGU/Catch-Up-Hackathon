@@ -1,5 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import Routers from './Routes';
+import { CookiesProvider } from 'react-cookie';
 
 const GlobalStyle = createGlobalStyle`
 @import url("https://fonts.googleapis.com/earlyaccess/notosanskr.css");
@@ -71,8 +72,10 @@ a{
 function App() {
   return (
     <>
+    <CookiesProvider>
       <GlobalStyle />
       <Routers/>
+    </CookiesProvider>
     </>
   );
 }

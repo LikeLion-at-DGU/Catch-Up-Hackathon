@@ -5,11 +5,12 @@ import { faCirclePlus, faCircleXmark  } from "@fortawesome/free-solid-svg-icons"
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import BoardBox from '../board/BoardBox';
+import { LogAPI, API } from '../../axios';
 
 const Background = styled.section`
     height: 370px;
@@ -41,46 +42,6 @@ const Title = styled.h2`
 const MoreInfo = styled(FontAwesomeIcon)`
     cursor: pointer;
 `
-
-
-const InsightInfo = [
-    {
-        category : "#공대생",
-        title : "정보통신공학과 3.03의 네카라쿠배 클라우드 최종합격 후기",
-        num : 25,
-        id: 1
-    },
-    {
-        category : "#마케팅",
-        title : "글빨로 TvN 합격한 썰",
-        num : 12,
-        id : 2
-    },
-    {
-        category : "#어학연수",
-        title : "보스턴대학교 2달 어학연수 후기",
-        num : 14,
-        id : 3
-    },
-    {
-        category : "#공대생",
-        title : "정보통신공학과 3.03의 네카라쿠배 클라우드 최종합격 후기",
-        num : 25,
-        id: 4
-    },
-    {
-        category : "#마케팅",
-        title : "글빨로 TvN 합격한 썰",
-        num : 12,
-        id : 5
-    },
-    {
-        category : "#어학연수",
-        title : "보스턴대학교 2달 어학연수 후기",
-        num : 14,
-        id : 6
-    }
-]
 
 const Insight = styled.section`
     width: ${props => props.theme.mainWidth};
@@ -186,10 +147,17 @@ const XMark = styled(FontAwesomeIcon)`
 function MainInsight(){
     const [clicked, setClicked] = useState(false);
     const [clickedInfo, setClickedInfo] = useState([]);
+    const [info, setInfo] = useState([])
+    const navigate = useNavigate();
 
     const onBoxClick = (i) => {
         setClicked(prev => !prev);
         setClickedInfo(i)
+    }
+
+    const onBoard = () => {
+        navigate("/board")
+        window.location.reload();
     }
 
     const onOverlayClick = () =>{
@@ -197,11 +165,30 @@ function MainInsight(){
         setClickedInfo([]);
     }
 
+    const getList = async() => {
+        try{
+            if(localStorage.getItem("user")){
+                const data = await LogAPI.get("/posts/mainpage/")
+                setInfo(data.data.posts)
+            }else{
+                const data = await API.get("/posts/mainpage/")
+                setInfo(data.data.posts)
+            }
+        }catch(error){
+            console.log(error)
+        }
+    }
+    console.log(info)
+
+    useEffect(() => {
+        getList()
+    },[clicked])
+
     return (
         <Background>
             <Header>
                 <Title>CATCHUP 들여다보기</Title>
-                <Link to="/board"><MoreInfo icon={faCirclePlus} size="2x"/></Link>
+                <MoreInfo onClick={onBoard} icon={faCirclePlus} size="2x"/>
             </Header>
             <Insight>
                 <Swiper slidesPerView={2.2}
@@ -211,17 +198,17 @@ function MainInsight(){
                         keyboard={true}
                         grabCursor={true}
                 >
-                    {InsightInfo.map(i => (
-                        <SwiperSlide key={i.id} >
-                            <Box layoutId={i.id+""} onClick={() => onBoxClick(i)}>
-                                <BoxCategory><p>{i.category}</p></BoxCategory>
+                    {info?.map(i => (
+                        <SwiperSlide key={i.post.id} >
+                            <Box layoutId={i.post.id+""} onClick={() => onBoxClick(i)}>
+                                <BoxCategory><p>{i.tag[0]} {i.tag[1]}</p></BoxCategory>
                                 <BoxTitle>
-                                    <p>{i.title}</p>
+                                    <p>{i.post.title}</p>
                                 </BoxTitle>
                                 <BoxChatInfo>
                                     <div>
-                                        <p>연결된 대화 수</p>
-                                        <p>{i.num}</p>
+                                        <p>관심있는 사람 수</p>
+                                        <p>{i.post.like_users.length}</p>
                                     </div>
                                 </BoxChatInfo>
                             </Box>

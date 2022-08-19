@@ -1,9 +1,9 @@
 import styled from 'styled-components';
-import BoardSearch from '../components/board/BoardSearch';
 import BoardList from '../components/board/BoardList';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquarePen } from "@fortawesome/free-solid-svg-icons";
 import { Link } from 'react-router-dom';
+
 
 const ToCenter = styled.div`
     width:100vw;
@@ -43,19 +43,12 @@ const SubTitle = styled.h4`
     margin-bottom: 55px;
 `
 
-const BoardDivider = styled.div`
-    max-width: 700px;
-    width : 100%; 
-    height: 3px;
-    border-radius: 4px;
-    background-color: black;
-`
 
 const Write = styled(FontAwesomeIcon)`
     position: fixed;
     font-size: 50px;
-    bottom : 30px;
-    right: 30px;
+    bottom : 10%;
+    right: 10%;
     cursor: pointer;
 `
 
@@ -65,10 +58,8 @@ function Board() {
             <Background>
                 <Title>멘토 이야기 모아보기</Title>
                 <SubTitle>당신이 원하는 멘토들의 글을 찾아보세요!</SubTitle>
-                <BoardSearch />
-                <BoardDivider />
                 <BoardList />
-                <Link to="/posting" ><Write icon={faSquarePen} /></Link>
+                {localStorage.getItem('user') && <Link to="/posting" ><Write icon={faSquarePen} /></Link>}
             </Background>
         </ToCenter>
     )

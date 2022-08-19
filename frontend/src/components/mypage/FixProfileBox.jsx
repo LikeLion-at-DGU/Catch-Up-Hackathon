@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilePen } from "@fortawesome/free-solid-svg-icons";
+import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { LogAPI } from '../../axios';
+import { useEffect, useState } from 'react';
 
 const Container = styled.form`
     width: ${props => props.theme.mainWidth};
@@ -47,9 +49,16 @@ const ProfilePoto= styled.div`
     align-items:center ;
     margin-top: 20px;
     margin-bottom: 30px;
+    position: relative;
 `
 const Poto = styled.input`
-    
+    display: none;
+`
+const Prepoto = styled.img`
+    margin-top: 15px;
+    width : 150px;
+    height: 150px;
+    border-radius: 150px;
 `
 
 const FixItem = styled.div`
@@ -78,29 +87,95 @@ const TextInput = styled.textarea`
     resize: none;
     height: 7em;
 `
+const Icon = styled(FontAwesomeIcon)`
+    font-size: 35px;
+    cursor: pointer;
+    position: absolute;
+    bottom:1px;
+    right:1px;
+    
+`
 
 
 function FixProfileBox () {
     const navigate = useNavigate()
     const {register,  handleSubmit} = useForm();
+    const [poto , setPoto] = useState()
+    const [nick, setNick] = useState();
+    const [intr, setIntr] = useState()
+    const getProfile = async() => {
+        try{
+            const data = await LogAPI.get("/users/myprofile/")
+            setPoto(data.data.profile.image)
+            setNick(data.data.profile.nickname)
+            setIntr(data.data.profile.introduction)
+        }catch(error){
+            console.log(error)
+        }
+    }
+    useEffect(() => {
+        getProfile()
+    },[])
+
+    function previewFile() {
+        var preview = document.querySelector('img');
+        var file = document.querySelector('input[type=file]').files[0];
+        var reader = new FileReader();
+        reader.addEventListener(
+          'load',
+          function () {
+            preview.src = reader.result;
+            setPoto(reader.result);
+          },
+          false
+        );
+        if (file) {
+          reader.readAsDataURL(file);
+        }
+      }
+
+    const onNick = (event) => {
+        setNick(event.target.value)
+    }
+
+    const onIntr = (event) => {
+        setIntr(event.target.value)
+    }
+    console.log(poto);
+    
     const onValid = async (data) => {
-        
+        const newData = {
+            "nickname" : nick,
+            "introduction" : intr,
+            "image" : poto ? poto : `https://t1.daumcdn.net/cfile/tistory/2513B53E55DB206927`,
+        }
+        try{
+            await LogAPI.patch('/users/myprofile_update/', newData)
+            navigate("/mypage")
+        } catch(error){
+            console.log(error)
+        }
     } 
     return(
         <Container onSubmit={handleSubmit(onValid)}>
             <Box>
                 {/* API 연동이후 작업하기!! */}
                 <ProfilePoto>
-                    <Poto {...register("img")} type="file"/>
+                    <Prepoto src={poto ? poto : `https://t1.daumcdn.net/cfile/tistory/2513B53E55DB206927`}/>
+                    <label for="file">
+                        <Icon icon={faCirclePlus}/>
+                    </label>
+                    <Poto id="file" {...register("img")} onChange={previewFile} type="file"/>
                 </ProfilePoto>
                 <FixItem>
                     <FixTitle>닉네임</FixTitle>
-                    <FixInput value={"집가고싶다"} {...register("nickname" , {required : true,})} placeholder="닉네임을 입력하세요!" />
+                    <FixInput {...register("nickname" )} placeholder="닉네임을 입력하세요!" value={nick ? nick : ""} onChange={onNick} />
                 </FixItem>
                 <FixItem>
                     <FixTitle>한줄소개</FixTitle>
-                    <TextInput value={"안녕하세요!! 집에 매우 몹시 가고싶은 이상돈입니다!! 채팅은 사절하니 연락 노노하세요~"} 
-                    {...register("intro" , {required : true,})} placeholder="자신을 소개해주세요!"/>
+                    <TextInput 
+                    {...register("intro" )} placeholder="자신을 소개해주세요!" value={intr ? intr : ""} 
+                    onChange={onIntr}/>
                 </FixItem>
             </Box>
             <BtnCon>

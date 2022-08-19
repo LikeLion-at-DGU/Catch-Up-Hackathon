@@ -6,7 +6,7 @@ const ToCenter = styled.div`
     width:100vw;
     display: flex;
     justify-content: center;
-    margin-top: 3px;
+    margin-top: 2.22px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 `
 

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const Wapper = styled.section`
     width: 100%;
@@ -29,6 +30,7 @@ const GridContainer = styled.div`
     grid-template-rows: repeat(14,50px);
 `
 const First = styled.div`
+    cursor: pointer;
     border-radius: 10px; 
     grid-row:1/ span 5;
     background-image: url("https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE4fHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=800&q=60");
@@ -46,6 +48,7 @@ const First = styled.div`
     }
 `
 const Second = styled.div`
+    cursor: pointer;
     border-radius: 10px; 
     grid-column: 3;
     grid-row: 3 / span 5;
@@ -64,6 +67,7 @@ const Second = styled.div`
     }
 `
 const Thrid = styled.div`
+    cursor: pointer;
     border-radius: 10px; 
     grid-row: 7/ span 5;
     background-image: url("https://images.unsplash.com/photo-1535303311164-664fc9ec6532?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80");
@@ -81,6 +85,7 @@ const Thrid = styled.div`
     }
 `
 const Fourth = styled.div`
+    cursor: pointer;
     border-radius: 10px; 
     grid-column: 3;
     grid-row:9/ span 5;
@@ -100,22 +105,35 @@ const Fourth = styled.div`
 `
 
 function MainTop(){
+const nav = useNavigate()
+const onFirst = () => {
+    nav("/hot/1")
+}
+const onSecond = () => {
+    nav("/hot/2")
+}
+const onThird = () => {
+    nav("/hot/3")
+}
+const onFourth = () => {
+    nav("/hot/4")
+}
 return (
     <Wapper>
         <Title>
             CATCHUP 인기 HASH TAG
         </Title>
         <GridContainer>
-            <First>
+            <First onClick={onFirst}>
                 <span>#개발자</span>
             </First>
-            <Second>
+            <Second onClick={onSecond}>
                 <span>#해외취업</span>
             </Second>
-            <Thrid>
+            <Thrid onClick={onThird}>
                 <span>#네카라쿠배</span>
             </Thrid>
-            <Fourth>
+            <Fourth onClick={onFourth}>
                 <span>#마케팅</span>
             </Fourth>
         </GridContainer>

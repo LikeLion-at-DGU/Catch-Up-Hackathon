@@ -1,4 +1,3 @@
-from tkinter import CASCADE
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save
@@ -7,6 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+
 
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password, **extra_fields):
@@ -55,10 +55,11 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=20, null=True, blank=False, unique=True)
     introduction = models.TextField(null=True)
-    image= models.ImageField(upload_to = "profile/", blank=True, null=True) # 사용자들이 시간표를 올릴 때마다 media/profile에 저장됨
-    coin = models.IntegerField(default=100)
-    star = models.IntegerField(default=5, validators=[MinValueValidator(0), MaxValueValidator(5)])
-    # chat_info = models. # chatting 클래스 참조
+    #image= models.ImageField(upload_to = "profile/", blank=True, null=True) # 사용자들이 시간표를 올릴 때마다 media/profile에 저장됨
+    image = models.TextField(null=True)
+    churu = models.IntegerField(default=100)
+    churu_charging = models.IntegerField(default=0)
+    # like_user_post = models.ForeignKey(Post, related_name='like_user_post', on_delete=models.CASCADE)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

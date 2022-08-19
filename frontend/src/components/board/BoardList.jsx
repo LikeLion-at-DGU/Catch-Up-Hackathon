@@ -1,10 +1,48 @@
 import styled from 'styled-components';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faHeart, faMessage, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faStar, faHeart, faEye, faCircleXmark , faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import { AnimatePresence, motion } from "framer-motion";
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BoardBox from './BoardBox';
+import { LogAPI, API } from '../../axios';
+import { useForm } from 'react-hook-form';
+import { useRecoilState } from 'recoil';
+import { isBox } from '../../atoms';
+
+const SearchWapper = styled.section`
+    width: ${props => props.theme.mainWidth};
+    max-width:${props => props.theme.mainMaxWidth};
+`
+
+const SearchSession = styled.section`
+    width:100%;
+    margin-bottom: 40px;
+`
+
+const SearchForm = styled.form`
+    width:100%;
+    position: relative;
+`
+
+const SearchInput = styled.input`
+    width:100%;
+    height: 45px;
+    font-size: 22px;
+    padding-left: 42px;
+    border : none;
+    border-radius: 15px;
+    background-color: #F5F5F5;
+`
+
+const SearchInputIcon = styled(FontAwesomeIcon)`
+    position: absolute;
+    bottom : 9px;
+    left: 8px;
+    font-size: 27px;
+`
+
+
 
 const Wapper = styled.section`
     max-width: 700px;
@@ -20,6 +58,7 @@ const List = styled.section`
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 60vh;
 `
 
 const BoxWapper = styled(motion.div)`
@@ -63,12 +102,14 @@ const Img = styled.img`
 `
 
 const Name = styled.p`
-    font-size: 14px;
+    font-size: 13px;
+    opacity: 0.7;
+    font-weight: 600;
     text-align: center;
 `
 const Title = styled.p`
-    font-size: 21px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
     line-height: 1.2;
 `
 
@@ -154,48 +195,34 @@ const XMark = styled(FontAwesomeIcon)`
     cursor: pointer;
 `
 
-
-// BigBox
-
-
-
-
-const InsightInfo = [
-    {
-        img : "https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-        category : ["#공대생", "#IT", "#네카라쿠배", "#클라우드", "#네카라쿠배 면접꿀팁", "#AWS", "#개발자 자기소개서"],
-        title : "정통 3.03의 네카라쿠배 클라우드 최종합격 후기",
-        like : 20,
-        link : 8,
-        rate : 4.4,
-        name : "네카라쿠데타",
-        id: 1
-    },
-    {
-        img : "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=798&q=80",
-        category : ["#마케팅", "#국문과취업", "#글쓰기"],
-        title : "글빨로 TvN 합격한 썰",
-        like : 10,
-        link : 4,
-        rate : 4.8,
-        name : "오잉",
-        id : 2
-    },
-    {
-        img : "https://images.unsplash.com/photo-1557862921-37829c790f19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1771&q=80",
-        category : ["#어학연수", "#미국", "#세관면접 팁", "#미국 동부", "#영어", "#미국 어학연수 추천코스", "여행코스도 추천 가능"],
-        title : "보스턴대학교 2달 어학연수 후기",
-        like : 9,
-        link : 2,
-        rate : 5.0,
-        name : "미국병",
-        id : 3
-    },
-]
+const BoardDivider = styled.div`
+    max-width: 700px;
+    width : 100%; 
+    height: 3px;
+    border-radius: 4px;
+    background-color: black;
+`
 
 function BoardList(){
-    const [clicked, setClicked] = useState(false);
+    const [clicked, setClicked] = useRecoilState(isBox);
     const [clickedInfo, setClickedInfo] = useState([]);
+    const [info, setInfo] = useState([])
+    const navigator = useNavigate();
+    const {register, handleSubmit} = useForm();
+
+    const getList = async() => {
+        try{
+            if(localStorage.getItem("user")){
+                const data = await LogAPI.get("/posts/")
+                setInfo(data.data)
+            }else{
+                const data = await API.get("/posts/")
+                setInfo(data.data)
+            }
+        }catch(error){
+            console.log(error)
+        }
+    }
 
     const onBoxClick = (i) => {
         setClicked(prev => !prev);
@@ -206,19 +233,44 @@ function BoardList(){
         setClicked(prev => !prev);
     }
 
+    const onValid = async(data) => {
+        try{
+            navigator(`/board/search/${data.search}`)
+        } catch(error){
+            console.log(error)
+        }
+    }
+    console.log(info)
+    useEffect(() => {
+        getList()
+    },[clicked])
+
     return(
+        <>
+        <SearchWapper>
+            <SearchSession>
+                <SearchForm onSubmit={handleSubmit(onValid)}>
+                    <SearchInputIcon icon={faMagnifyingGlass}/>
+                    <SearchInput 
+                        {...register("search", {required : true} )}
+                        placeholder = "제목, 내용, 해시태그 검색" >
+                    </SearchInput>
+                </SearchForm>
+            </SearchSession>
+        </SearchWapper>
+        <BoardDivider />
         <Wapper>
             <List>
-                {InsightInfo.map(prev => (
-                    <BoxWapper layoutId={prev.id+""} onClick={() => onBoxClick(prev)} key={prev.id}>
+                {info?.map(prev => (
+                    <BoxWapper layoutId={prev.post.id+""} onClick={() => onBoxClick(prev)} key={prev.post.id}>
                         <Box >
                         <BoxProfile>
-                            <Img src={prev.img} />
-                            <Name>{prev.name}</Name>
+                            <Img src={prev.writer.image ? prev.writer.image : `https://t1.daumcdn.net/cfile/tistory/2513B53E55DB206927`} />
+                            <Name>{prev.writer.nickname}</Name>
                         </BoxProfile>
                         <BoxInfo>
-                            <Title>{prev.title}</Title>
-                            <Tags>{prev.category.map(i => <p>{i}</p>)}</Tags>
+                            <Title>{prev.post.title}</Title>
+                            <Tags>{prev.tag.map(i => <p>{i}</p>)}</Tags>
                             <BoxChatInfo>
                                 <Rate>
                                     <Icon icon={faStar} />
@@ -226,11 +278,11 @@ function BoardList(){
                                 </Rate>
                                 <Like>
                                     <Icon icon={faHeart} />
-                                    <p>{prev.like}</p>
+                                    <p>{prev.post.like_users.length}</p>
                                 </Like>
                                 <ChatNum>
-                                    <Icon icon={faMessage} />
-                                    <p>{prev.link}</p>
+                                    <Icon icon={faEye} />
+                                    <p>{prev.post.view_users}</p>
                                 </ChatNum>
                             </BoxChatInfo>
                         </BoxInfo>
@@ -246,13 +298,13 @@ function BoardList(){
                             animate={{ opacity: 1 }} 
                             exit={{ opacity: 0 }}
                         >
-                            <BigBox layoutId={clickedInfo?.id+""} >
+                            <BigBox layoutId={clickedInfo?.post.id+""} >
                                 <BoardBox props={clickedInfo}/>
                                 <XMark onClick = {onOverlayClick} icon={faCircleXmark} />
                             </BigBox>
                         </Overlay> : null}
             </AnimatePresence>
-        </Wapper>
+        </Wapper></>
     );
 }
 

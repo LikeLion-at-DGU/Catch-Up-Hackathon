@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useState } from 'react';
+import { LogAPI } from '../../axios';
 
 const Container = styled.section`
     width: ${props => props.theme.mainWidth};
@@ -98,14 +101,28 @@ const FixBtn = styled.button`
 
 
 function ProfileBox () {
+    const [info, setInfo] = useState()
     const navigate = useNavigate()
+    const getProfile = async() => {
+        try{
+            const data = await LogAPI.get("/users/myprofile/")
+            setInfo(data.data)
+        }catch(error){
+            console.log(error)
+        }
+    }
+    console.log(info)
+    useEffect(() => {
+        getProfile()
+    },[])
+
     return (
         <Container>
         <Box>
             <ImgBox>
-                <Prepoto src={"https://t1.daumcdn.net/cfile/tistory/2513B53E55DB206927"} />
-                <Name>이상돈</Name>
-                <NickName>집가고 싶다</NickName>
+                <Prepoto src={info?.profile.image ? info?.profile.image : `https://t1.daumcdn.net/cfile/tistory/2513B53E55DB206927`}/>
+                <Name>{info?.profile.nickname}</Name>
+                <NickName>Basic</NickName>
             </ImgBox>
             <InfoBox>
                 <InfoItem>
@@ -113,7 +130,7 @@ function ProfileBox () {
                         Chur
                     </ItemTitle>
                     <ItemBody>
-                        50
+                        {info?.profile.churu}
                     </ItemBody>
                 </InfoItem>
                 <InfoItem>
@@ -121,7 +138,7 @@ function ProfileBox () {
                         Star
                     </ItemTitle>
                     <ItemBody>
-                        4.8/5
+                        {info?.rate}/5
                     </ItemBody>
                 </InfoItem>
                 <InfoItem>
@@ -129,7 +146,7 @@ function ProfileBox () {
                         Chat
                     </ItemTitle>
                     <ItemBody>
-                        2
+                        {info?.room_count}
                     </ItemBody>
                 </InfoItem>
             </InfoBox>
@@ -138,7 +155,7 @@ function ProfileBox () {
                     한줄 소개
                 </IntroTitle>
                 <IntroBody>
-                    안녕하세요!! 집에 매우 몹시 가고싶은 이상돈입니다!! 채팅은 사절하니 연락 노노하세요~
+                    {info?.profile.introduction}
                 </IntroBody>
             </IntroBox>
         </Box>
